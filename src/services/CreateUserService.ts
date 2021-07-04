@@ -1,18 +1,20 @@
 //tudo que for relacionado a criação de usuario é aqui
-import { UsersRpositories } from "../repositories/UsersRpositories"
+import { UsersRepositories } from "../repositories/UsersRepositories"
 import {getCustomRepository} from "typeorm"
+import {hash} from "bcryptjs"
 
 interface IUserRequest {
   name: string;
   email: string;
+  password: string;
   admin?:boolean;
 }
 
 class CreateUserService {
 
-  async execute({ name, email, admin}:IUserRequest) {
+  async execute({ name, email, admin, password}:IUserRequest) {
     //chama o repositório customizado
-    const usersRpositories = getCustomRepository(UsersRpositories)
+    const usersRepositories = getCustomRepository(UsersRepositories)
 
     //verefica se o email está certo
     if(!email){
@@ -20,16 +22,19 @@ class CreateUserService {
     }
 
     //verefica se o email existe
-    const userAlreadyExists = await usersRpositories.findOne({email})
+    const userAlreadyExists = await usersRepositories.findOne({email})
     if(userAlreadyExists) {
       throw new Error("O usuario já existe")
     }
 
+    //criptografia de senha
+    const passwordHash = await hash(password, 10)
+
     //prepara para salvar
-    const user = usersRpositories.create({name, email, admin})
+    const user = usersRepositories.create({name, email, admin, password:passwordHash})
     
     //salva o usuario
-    await usersRpositories.save(user);
+    await usersRepositories.save(user);
     
     //entrega as informações
     return user;

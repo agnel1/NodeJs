@@ -1,31 +1,27 @@
 import {Router} from "express"
+import { AuthenticateUserController } from "./controlles/AuthenticateUserController"
+import { CreateTagController } from "./controlles/CreateTagController"
 import { CreateUserController } from "./controlles/CreateUserController"
+import { ensureAdmin } from "./middlewares/ensureAdmin"
 
 const router = Router()
 
 const createUserController = new CreateUserController()
+const createTagController = new CreateTagController()
+const authenticateUserController = new AuthenticateUserController()
 
 //rota Post => envia informações 
-router.post('/post', createUserController.handle)
+router.post('/users', createUserController.handle)
 
+router.post('/tags', ensureAdmin, createTagController.handle)
+
+router.post('/login', authenticateUserController.handle)
 //rota Get => buscas informações
-router.get('/', (req, res) => {
-    return res.send("req.params[0]")
-})
 
-//rota para alterar informações
-router.put('/put', (req, res) => {
-    return res.send("rota para alterar")
-})
+//rota para put altera informações
 
-//rota para alterar envia informações especificas
-router.patch('/patch', (req, res) =>{
-    return res.send("rota para alterar algo especifico") 
-})
+//rota para router.patch('/patch' envia informações especificas
 
 //rota para deletar => envia informações
-router.delete('/delete', (req, res) =>{
-    return res.send("rota para deletar")
-})
 
 export {router}
