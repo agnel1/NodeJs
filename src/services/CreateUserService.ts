@@ -12,7 +12,7 @@ interface IUserRequest {
 
 class CreateUserService {
 
-  async execute({ name, email, admin, password}:IUserRequest) {
+  async execute({ name, email, admin = false, password}:IUserRequest) {
     //chama o repositório customizado
     const usersRepositories = getCustomRepository(UsersRepositories)
 
